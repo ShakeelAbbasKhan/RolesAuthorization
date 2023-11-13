@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RolesAuthorization.Data;
@@ -8,6 +9,7 @@ using RolesAuthorization.Repository;
 
 namespace RolesAuthorization.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -24,7 +26,7 @@ namespace RolesAuthorization.Controllers
             _productRepository = productRepository;
         }
 
-        // GET: api/products
+        [Authorize(Policy = "ViewProductPolicy")]
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
@@ -33,7 +35,7 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<ProductDto>>(std));
         }
 
-        // GET: api/products/{id}
+        [Authorize(Policy = "ViewProductPolicy")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -44,8 +46,8 @@ namespace RolesAuthorization.Controllers
             }
             return Ok(_mapper.Map<ProductDto>(cat));
         }
-
-        // POST: api/products
+        
+        [Authorize(Policy = "CreateProductPolicy")]
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
@@ -60,7 +62,8 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetProduct", new { id = cat.Id }, _mapper.Map<CreateProductDto>(cat));
         }
 
-        // PUT: api/products/{id}
+        [Authorize(Policy = "EditProductPolicy")]
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromBody] UpdateProductDto updateProductDto)
         {
@@ -80,7 +83,7 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        // DELETE: api/products/{id}
+        [Authorize(Policy = "DeleteProductPolicy")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

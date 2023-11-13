@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace RolesAuthorization.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // GET: api/categories
+       // [Authorize("Permission.Category.View")]
         [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
@@ -32,7 +33,7 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<CategoryDto>>(std));
         }
 
-        // GET: api/categories/{id}
+        [Authorize("Permission.Category.View")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
@@ -44,7 +45,7 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<CategoryDto>(cat));
         }
 
-        // POST: api/categories
+        [Authorize("Permission.Category.Create")]
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
         {
@@ -59,7 +60,7 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetCategory", new { id = cat.Id }, _mapper.Map<CreateCategoryDto>(cat));
         }
 
-        // PUT: api/categories/{id}
+        [Authorize("Permission.Category.Edit")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromRoute] int id, [FromBody] UpdateCategoryDto updateCategoryDto)
         {
@@ -79,7 +80,7 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        // DELETE: api/categories/{id}
+        [Authorize("Permission.Category.Delete")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
