@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using RolesAuthorization.Constant;
-
+using RolesAuthorization.Middleware;
 
 namespace RolesAuthorization
 {
@@ -49,6 +49,11 @@ namespace RolesAuthorization
             builder.Services.AddScoped<JWTService>();
 
 
+            //builder.Services.AddControllers(options =>
+            //{
+            //    options.Filters.Add<RefreshTokenValidationMiddleware>();
+            //});
+
             // Adding Authentication  
             builder.Services.AddAuthentication(options =>
             {
@@ -57,21 +62,21 @@ namespace RolesAuthorization
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
 
-                        // Adding Jwt Bearer  
-                        .AddJwtBearer(options =>
-                        {
-                            options.SaveToken = true;
-                            options.RequireHttpsMetadata = false;
-                            options.TokenValidationParameters = new TokenValidationParameters()
-                            {
-                                ValidateIssuer = true,
-                                ValidateAudience = true,
-                                ValidAudience = builder.Configuration["JWTKey:ValidAudience"],
-                                ValidIssuer = builder.Configuration["JWTKey:ValidIssuer"],
-                                ClockSkew = TimeSpan.Zero,
-                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTKey:Secret"]))
-                            };
-                        });
+                // Adding Jwt Bearer  
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidAudience = builder.Configuration["JWTKey:ValidAudience"],
+                        ValidIssuer = builder.Configuration["JWTKey:ValidIssuer"],
+                        ClockSkew = TimeSpan.Zero,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTKey:Secret"]))
+                    };
+                });
 
             // policy for authorize
 
@@ -87,7 +92,34 @@ namespace RolesAuthorization
                     policy.RequireClaim("Permission", Permissions.Products.Edit));
 
                 options.AddPolicy("DeleteProductPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Products.Delete));
+                   policy.RequireClaim("Permission", Permissions.Products.Delete));
+
+                options.AddPolicy("ViewCategoryPolicy", policy =>
+                   policy.RequireClaim("Permission", Permissions.Category.View));
+
+                options.AddPolicy("CreateCategoryPolicy", policy =>
+                    policy.RequireClaim("Permission", Permissions.Category.Create));
+
+                options.AddPolicy("EditCategoryPolicy", policy =>
+                    policy.RequireClaim("Permission", Permissions.Category.Edit));
+
+                options.AddPolicy("DeleteCategoryPolicy", policy =>
+                   policy.RequireClaim("Permission", Permissions.Category.Delete));
+
+                options.AddPolicy("ViewSubCategoryPolicy", policy =>
+                   policy.RequireClaim("Permission", Permissions.SubCategory.View));
+
+                options.AddPolicy("CreateSubCategoryPolicy", policy =>
+                    policy.RequireClaim("Permission", Permissions.SubCategory.Create));
+
+                options.AddPolicy("EditSubCategoryPolicy", policy =>
+                    policy.RequireClaim("Permission", Permissions.SubCategory.Edit));
+
+                options.AddPolicy("DeleteSubCategoryPolicy", policy =>
+                   policy.RequireClaim("Permission", Permissions.SubCategory.Delete));
+
+
+
             });
 
 

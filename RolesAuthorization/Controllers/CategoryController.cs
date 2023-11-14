@@ -24,7 +24,7 @@ namespace RolesAuthorization.Controllers
             _categoryRepository = categoryRepository;
         }
 
-       // [Authorize("Permission.Category.View")]
+        [Authorize(Policy = "ViewCategoryPolicy")]
         [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
@@ -33,7 +33,7 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<CategoryDto>>(std));
         }
 
-        [Authorize("Permission.Category.View")]
+        [Authorize(Policy = "ViewCategoryPolicy")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
@@ -45,7 +45,7 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<CategoryDto>(cat));
         }
 
-        [Authorize("Permission.Category.Create")]
+        [Authorize(Policy = "CreateCategoryPolicy")]
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
         {
@@ -60,7 +60,7 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetCategory", new { id = cat.Id }, _mapper.Map<CreateCategoryDto>(cat));
         }
 
-        [Authorize("Permission.Category.Edit")]
+        [Authorize(Policy = "EditCategoryPolicy")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromRoute] int id, [FromBody] UpdateCategoryDto updateCategoryDto)
         {
@@ -80,7 +80,7 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        [Authorize("Permission.Category.Delete")]
+        [Authorize(Policy = "DeleteCategoryPolicy")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

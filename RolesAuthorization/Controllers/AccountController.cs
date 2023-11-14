@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RolesAuthorization.Constant;
 using RolesAuthorization.Data;
 using RolesAuthorization.Helper;
 using RolesAuthorization.ViewModels;
@@ -16,18 +17,20 @@ namespace RolesAuthorization.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
         private readonly JWTService _jWTService;
         private readonly IConfiguration _configuration;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, ILogger<AccountController> logger,JWTService jWTService, IConfiguration configuration)
+            SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, ILogger<AccountController> logger,JWTService jWTService, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _configuration = configuration;
             _jWTService = jWTService;
+            _roleManager = roleManager;
         }
 
         [HttpPost("Login")]
@@ -60,6 +63,21 @@ namespace RolesAuthorization.Controllers
                     foreach (var userRole in userRoles)
                     {
                         authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+
+
+                        var role = await _roleManager.FindByNameAsync(userRole);
+
+                        if (role != null)
+                        {
+                           
+                            var roleClaims = await _roleManager.GetClaimsAsync(role);
+
+                            var permissionClaims = roleClaims
+                            .Select(claim => new Claim("Permission", claim.Value));
+
+                            authClaims.AddRange(permissionClaims);
+                        }
+
                     }
                     _TokenViewModel.AccessToken = _jWTService.GenerateToken(authClaims);
                     //  _TokenViewModel.RefreshToken = _authService.GenerateRefreshToken();
