@@ -6,6 +6,7 @@ using RolesAuthorization.Constant;
 using RolesAuthorization.Data;
 using RolesAuthorization.Helper;
 using RolesAuthorization.ViewModels;
+using System.Security;
 
 namespace RolesAuthorization.Controllers
 {
@@ -23,30 +24,39 @@ namespace RolesAuthorization.Controllers
             _userManager = userManager;
         }
 
+
         [HttpGet("{roleId}")]
         public async Task<ActionResult<PermissionViewModel>> Index(string roleId)
         {
             var model = new PermissionViewModel();
             var allPermissions = new List<RoleClaimsViewModel>();
-            allPermissions.GetPermissions(typeof(Permissions.Products), roleId);
-            allPermissions.GetPermissions(typeof(Permissions.Category), roleId);
-            allPermissions.GetPermissions(typeof(Permissions.SubCategory), roleId);
             var role = await _roleManager.FindByIdAsync(roleId);
+
+            if (role == null)
+            {
+                return NotFound();
+            }
+
             model.RoleId = roleId;
             var claims = await _roleManager.GetClaimsAsync(role);
-            var allClaimValues = allPermissions.Select(a => a.Value).ToList();
-            var roleClaimValues = claims.Select(a => a.Value).ToList();
-            var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
-            foreach (var permission in allPermissions)
+
+            foreach (var claim in claims)
             {
-                if (authorizedClaims.Any(a => a == permission.Value))
+                var roleClaim = new RoleClaimsViewModel
                 {
-                    permission.Selected = true;
-                }
+                    Type = claim.Type,
+                    Value = claim.Value,
+                    Selected = true,
+                    
+            };
+
+                allPermissions.Add(roleClaim);
             }
+
             model.RoleClaims = allPermissions;
             return Ok(model);
         }
+
 
         [HttpPost("Update")]
         public async Task<IActionResult> Update(PermissionViewModel model)

@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RolesAuthorization.Data;
 using RolesAuthorization.ViewModels;
 
 namespace RolesAuthorization.Controllers
 {
-    //[Authorize(Policy = "AdminOnly")]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserRolesController : ControllerBase
