@@ -14,6 +14,8 @@ using System.Security.Principal;
 using System.Text;
 using RolesAuthorization.Constant;
 using RolesAuthorization.Middleware;
+using RolesAuthorization.Filters;
+using RolesAuthorization.Claims;
 
 namespace RolesAuthorization
 {
@@ -27,7 +29,8 @@ namespace RolesAuthorization
             builder.Services.AddDbContext<ApplicationDbContext>
             (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            builder.Services.AddAuthorization();
+            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
             builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
             // configure the Identity 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -52,6 +55,11 @@ namespace RolesAuthorization
             //builder.Services.AddControllers(options =>
             //{
             //    options.Filters.Add<RefreshTokenValidationMiddleware>();
+            //});
+
+            //builder.Services.AddControllers(options =>
+            //{
+            //    options.Filters.Add<DynamicPermissionCheckFilter>();
             //});
 
             // Adding Authentication  
@@ -80,57 +88,52 @@ namespace RolesAuthorization
 
             // policy for authorize
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ViewProductPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Products.View));
-
-                options.AddPolicy("CreateProductPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Products.Create));
-
-                options.AddPolicy("EditProductPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Products.Edit));
-
-                options.AddPolicy("DeleteProductPolicy", policy =>
-                   policy.RequireClaim("Permission", Permissions.Products.Delete));
-
-                options.AddPolicy("ViewCategoryPolicy", policy =>
-                   policy.RequireClaim("Permission", Permissions.Category.View));
-
-                options.AddPolicy("CreateCategoryPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Category.Create));
-
-                options.AddPolicy("EditCategoryPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.Category.Edit));
-
-                options.AddPolicy("DeleteCategoryPolicy", policy =>
-                   policy.RequireClaim("Permission", Permissions.Category.Delete));
-
-                options.AddPolicy("ViewSubCategoryPolicy", policy =>
-                   policy.RequireClaim("Permission", Permissions.SubCategory.View));
-
-                options.AddPolicy("CreateSubCategoryPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.SubCategory.Create));
-
-                options.AddPolicy("EditSubCategoryPolicy", policy =>
-                    policy.RequireClaim("Permission", Permissions.SubCategory.Edit));
-
-                options.AddPolicy("DeleteSubCategoryPolicy", policy =>
-                   policy.RequireClaim("Permission", Permissions.SubCategory.Delete));
-
-
-
-            });
-
-
-
             //builder.Services.AddAuthorization(options =>
             //{
-            //    options.AddPolicy("AdminOnly", policy => policy.Requirements.Add(new AdminRequirement()));
+            //    options.AddPolicy("ViewProductPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.Products.View));
+
+            //    options.AddPolicy("CreateProductPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.Products.Create));
+
+            //    options.AddPolicy("EditProductPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.Products.Edit));
+
+            //    options.AddPolicy("DeleteProductPolicy", policy =>
+            //       policy.RequireClaim("Permission", Permissions.Products.Delete));
+
+            //    options.AddPolicy("ViewCategoryPolicy", policy =>
+            //       policy.RequireClaim("Permission", Permissions.Category.View));
+
+            //    options.AddPolicy("CreateCategoryPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.Category.Create));
+
+            //    options.AddPolicy("EditCategoryPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.Category.Edit));
+
+            //    options.AddPolicy("DeleteCategoryPolicy", policy =>
+            //       policy.RequireClaim("Permission", Permissions.Category.Delete));
+
+            //    options.AddPolicy("ViewSubCategoryPolicy", policy =>
+            //       policy.RequireClaim("Permission", Permissions.SubCategory.View));
+
+            //    options.AddPolicy("CreateSubCategoryPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.SubCategory.Create));
+
+            //    options.AddPolicy("EditSubCategoryPolicy", policy =>
+            //        policy.RequireClaim("Permission", Permissions.SubCategory.Edit));
+
+            //    options.AddPolicy("DeleteSubCategoryPolicy", policy =>
+            //       policy.RequireClaim("Permission", Permissions.SubCategory.Delete));
             //});
 
-            //   builder.Services.AddSingleton<IAuthorizationHandler, AdminAuthorizationHandler>();
 
+
+            builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddScoped<IPermissionService, PermissionService>();
+
+            builder.Services.AddScoped<PermissionUser>();
 
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -160,6 +163,8 @@ namespace RolesAuthorization
 
             });
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

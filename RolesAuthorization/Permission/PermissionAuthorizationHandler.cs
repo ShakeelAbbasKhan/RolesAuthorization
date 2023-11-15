@@ -1,29 +1,55 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using RolesAuthorization.Claims;
+using RolesAuthorization.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace RolesAuthorization.Permission
 {
     internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
     {
 
-        public PermissionAuthorizationHandler()
+        private readonly PermissionUser _permissionUser;
+        private readonly IPermissionService _permissionService;
+        public PermissionAuthorizationHandler(PermissionUser permissionUser, IPermissionService permissionService)
         {
 
+            _permissionUser = permissionUser;
+            _permissionService = permissionService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            if (context.User == null)
+           
+         
+            string memberId = _permissionUser.GetUserId();
+
+            if (memberId == null)
             {
                 return;
             }
-            var permissionss = context.User.Claims.Where(x => x.Type == "Permission" &&
-                                                            x.Value == requirement.Permission &&
-                                                            x.Issuer == "LOCAL AUTHORITY");
-            if (permissionss.Any())
+
+            HashSet<string> permissions = await _permissionService.GetPermissionsAsync(memberId);
+
+            if (permissions.Contains(requirement.Permission))
             {
                 context.Succeed(requirement);
-                return;
             }
+
+
+            //if (context.User == null)
+            //{
+            //    return;
+            //}
+            //var permissionss = context.User.Claims.Where(x => x.Type == "Permission" &&
+            //                                                x.Value == requirement.Permission);
+            //if (permissionss.Any())
+            //{
+            //    context.Succeed(requirement);
+            //    return;
+            //}
         }
     }
 }

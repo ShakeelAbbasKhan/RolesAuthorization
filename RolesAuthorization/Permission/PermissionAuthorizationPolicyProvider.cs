@@ -3,11 +3,28 @@ using Microsoft.Extensions.Options;
 
 namespace RolesAuthorization.Permission
 {
-    internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
+    //public class PermissionAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
+    //{
+    //    public PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
+    //    {
+    //    }
+    //    public override async Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
+    //    {
+    //        AuthorizationPolicy? policy  = await base.GetPolicyAsync(policyName);
+
+    //        if(policy is not null) {
+    //            return policy;
+    //        }
+    //        return new AuthorizationPolicyBuilder().AddRequirements(new PermissionRequirement(policyName))
+    //                .Build();
+    //    }
+    //}
+
+    public class PermissionAuthorizationPolicyProvider : IAuthorizationPolicyProvider
     {
         public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
 
-        public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
+        public PermissionAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
         {
             // There can only be one policy provider in ASP.NET Core.
             // We only handle permissions related policies, for the rest
@@ -21,12 +38,12 @@ namespace RolesAuthorization.Permission
         // The policy name must match the permission that is needed.
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
-            {
+            //if (policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
+            //{
                 var policy = new AuthorizationPolicyBuilder();
                 policy.AddRequirements(new PermissionRequirement(policyName));
                 return Task.FromResult(policy.Build());
-            }
+            //}
 
             // Policy is not for permissions, try the default provider.
             return FallbackPolicyProvider.GetPolicyAsync(policyName);
@@ -34,4 +51,6 @@ namespace RolesAuthorization.Permission
 
         public Task<AuthorizationPolicy> GetFallbackPolicyAsync() => FallbackPolicyProvider.GetDefaultPolicyAsync();
     }
+
+
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RolesAuthorization.Constant;
 using RolesAuthorization.Data;
 using RolesAuthorization.Dtos;
 using RolesAuthorization.Model;
@@ -24,7 +25,8 @@ namespace RolesAuthorization.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        [Authorize(Policy = "ViewCategoryPolicy")]
+        // [Authorize(Policy = "ViewCategoryPolicy")]
+        [Authorize(Permissions.Category.View)]
         [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
@@ -33,7 +35,9 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<CategoryDto>>(std));
         }
 
-        [Authorize(Policy = "ViewCategoryPolicy")]
+        //[Authorize(Policy = "ViewCategoryPolicy")]
+
+        [Authorize(Permissions.Category.View)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
@@ -45,7 +49,10 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<CategoryDto>(cat));
         }
 
-        [Authorize(Policy = "CreateCategoryPolicy")]
+        // [Authorize(Policy = "CreateCategoryPolicy")]
+
+        [Authorize(Permissions.Category.Create)]
+
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
         {
@@ -60,7 +67,9 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetCategory", new { id = cat.Id }, _mapper.Map<CreateCategoryDto>(cat));
         }
 
-        [Authorize(Policy = "EditCategoryPolicy")]
+        // [Authorize(Policy = "EditCategoryPolicy")]
+
+        [Authorize(Permissions.Category.Edit)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromRoute] int id, [FromBody] UpdateCategoryDto updateCategoryDto)
         {
@@ -80,7 +89,10 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        [Authorize(Policy = "DeleteCategoryPolicy")]
+        // [Authorize(Policy = "DeleteCategoryPolicy")]
+
+        [Authorize(Permissions.Category.Delete)]
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

@@ -69,7 +69,7 @@ namespace RolesAuthorization.Controllers
 
                         if (role != null)
                         {
-                           
+
                             var roleClaims = await _roleManager.GetClaimsAsync(role);
 
                             var permissionClaims = roleClaims

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RolesAuthorization.Constant;
 using RolesAuthorization.Data;
 using RolesAuthorization.Dtos;
 using RolesAuthorization.Model;
@@ -9,7 +10,7 @@ using RolesAuthorization.Repository;
 
 namespace RolesAuthorization.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -26,7 +27,10 @@ namespace RolesAuthorization.Controllers
             _productRepository = productRepository;
         }
 
-        [Authorize(Policy = "ViewProductPolicy")]
+       //  [Authorize(Policy = "ViewProductPolicy")]
+
+        [Authorize(Permissions.Products.View)]
+
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
@@ -35,7 +39,9 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<ProductDto>>(std));
         }
 
-        [Authorize(Policy = "ViewProductPolicy")]
+        // [Authorize(Policy = "ViewProductPolicy")]
+
+        [Authorize(Permissions.Products.View)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -46,8 +52,11 @@ namespace RolesAuthorization.Controllers
             }
             return Ok(_mapper.Map<ProductDto>(cat));
         }
-        
-        [Authorize(Policy = "CreateProductPolicy")]
+
+        // [Authorize(Policy = "CreateProductPolicy")]
+
+        [Authorize(Permissions.Products.Create)]
+
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
@@ -62,8 +71,10 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetProduct", new { id = cat.Id }, _mapper.Map<CreateProductDto>(cat));
         }
 
-        [Authorize(Policy = "EditProductPolicy")]
-        
+        // [Authorize(Policy = "EditProductPolicy")]
+
+        [Authorize(Permissions.Products.Edit)]
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromBody] UpdateProductDto updateProductDto)
         {
@@ -83,7 +94,10 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        [Authorize(Policy = "DeleteProductPolicy")]
+        // [Authorize(Policy = "DeleteProductPolicy")]
+
+        [Authorize(Permissions.Products.Delete)]
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

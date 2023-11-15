@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RolesAuthorization.Constant;
 using RolesAuthorization.Data;
 using RolesAuthorization.Dtos;
 using RolesAuthorization.Model;
@@ -25,7 +26,8 @@ namespace RolesAuthorization.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Policy = "ViewSubCategoryPolicy")]
+        // [Authorize(Policy = "ViewSubCategoryPolicy")]
+        [Authorize(Permissions.SubCategory.View)]
         [HttpGet]
         public async Task<IActionResult> GetSubCategories()
         {
@@ -34,7 +36,8 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<List<SubCategoryDto>>(std));
         }
 
-        [Authorize(Policy = "ViewSubCategoryPolicy")]
+        // [Authorize(Policy = "ViewSubCategoryPolicy")]
+        [Authorize(Permissions.SubCategory.View)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSubCategory(int id)
         {
@@ -46,7 +49,8 @@ namespace RolesAuthorization.Controllers
             return Ok(_mapper.Map<SubCategoryDto>(cat));
         }
 
-        [Authorize(Policy = "CreateSubCategoryPolicy")]
+        // [Authorize(Policy = "CreateSubCategoryPolicy")]
+        [Authorize(Permissions.SubCategory.Create)]
         [HttpPost]
         public async Task<IActionResult> CreateSubCategory([FromBody] CreateSubCategoryDto createSubCategoryDto)
         {
@@ -61,7 +65,9 @@ namespace RolesAuthorization.Controllers
             return CreatedAtAction("GetSubCategory", new { id = cat.Id }, _mapper.Map<CreateSubCategoryDto>(cat));
         }
 
-        [Authorize(Policy = "EditSubCategoryPolicy")]
+        // [Authorize(Policy = "EditSubCategoryPolicy")]
+
+        [Authorize(Permissions.SubCategory.Edit)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSubCategory([FromRoute] int id, [FromBody] UpdateSubCategoryDto updateSubCategoryDto)
         {
@@ -81,7 +87,9 @@ namespace RolesAuthorization.Controllers
             return NotFound();
         }
 
-        [Authorize(Policy = "DeleteSubCategoryPolicy")]
+        // [Authorize(Policy = "DeleteSubCategoryPolicy")]
+
+        [Authorize(Permissions.SubCategory.Delete)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubCategory(int id)
         {

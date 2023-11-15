@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RolesAuthorization.Constant;
+using RolesAuthorization.Data;
 using RolesAuthorization.Helper;
 using RolesAuthorization.ViewModels;
 
@@ -14,10 +15,12 @@ namespace RolesAuthorization.Controllers
     public class PermissionController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PermissionController(RoleManager<IdentityRole> roleManager)
+        public PermissionController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         [HttpGet("{roleId}")]
@@ -59,6 +62,7 @@ namespace RolesAuthorization.Controllers
             {
                 await _roleManager.AddPermissionClaim(role, claim.Value);
             }
+
             return Ok(new { Message = "Permissions updated successfully." });
         }
     }

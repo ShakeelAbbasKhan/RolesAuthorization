@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using RolesAuthorization.Data;
 
 namespace RolesAuthorization.AuthorizeMiddleware
 {
