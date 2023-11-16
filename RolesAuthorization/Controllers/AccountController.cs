@@ -52,34 +52,34 @@ namespace RolesAuthorization.Controllers
                 var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, true);
                 if (result.Succeeded)
                 {
-                    var userRoles = await _userManager.GetRolesAsync(user);
-                    var authClaims = new List<Claim>
-                    {
-                       new Claim(ClaimTypes.Name, user.UserName),
-                       new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    };
+                    //var userRoles = await _userManager.GetRolesAsync(user);
+                    //var authClaims = new List<Claim>
+                    //{
+                    //   new Claim(ClaimTypes.Name, user.UserName),
+                    //   new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    //};
 
 
-                    foreach (var userRole in userRoles)
-                    {
-                        authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    //foreach (var userRole in userRoles)
+                    //{
+                    //    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
 
 
-                        var role = await _roleManager.FindByNameAsync(userRole);
+                    //    var role = await _roleManager.FindByNameAsync(userRole);
 
-                        if (role != null)
-                        {
+                    //    if (role != null)
+                    //    {
 
-                            var roleClaims = await _roleManager.GetClaimsAsync(role);
+                    //        var roleClaims = await _roleManager.GetClaimsAsync(role);
 
-                            var permissionClaims = roleClaims
-                            .Select(claim => new Claim("Permission", claim.Value));
+                    //        var permissionClaims = roleClaims
+                    //        .Select(claim => new Claim("Permission", claim.Value));
 
-                            authClaims.AddRange(permissionClaims);
-                        }
+                    //        authClaims.AddRange(permissionClaims);
+                    //    }
 
-                    }
-                    _TokenViewModel.AccessToken = _jWTService.GenerateToken(authClaims);
+                    //}
+                    _TokenViewModel.AccessToken =await _jWTService.GenerateTokenString(model);
                     //  _TokenViewModel.RefreshToken = _authService.GenerateRefreshToken();
                     _TokenViewModel.StatusCode = 1;
                     _TokenViewModel.StatusMessage = "Success";
